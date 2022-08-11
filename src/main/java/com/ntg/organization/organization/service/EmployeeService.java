@@ -1,7 +1,10 @@
 package com.ntg.organization.organization.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.ntg.organization.organization.entity.Department;
+import com.ntg.organization.organization.respository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,9 @@ public class EmployeeService {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+
+	@Autowired
+	private DepartmentRepository departmentRepository;
 
 	public List<Employee> getAllEmployee() {
 		return (List<Employee>) employeeRepository.findAll();
@@ -36,6 +42,21 @@ public class EmployeeService {
 
 	public Employee getEmployeeByName(String name, String email) {
 		return employeeRepository.findByNameAndEmail(name, email);
+	}
+
+	public Employee setDepartment(Long empId, Long depId){
+		Optional<Employee> optEmp = employeeRepository.findById(empId);
+		Employee emp;
+		Department dep;
+		if (optEmp.isPresent()){
+			emp = optEmp.get();
+			Optional <Department> optDep = departmentRepository.findById(depId);
+			if (optDep.isPresent()) dep = optDep.get();
+			else return null;
+			emp.setDepartment(dep);
+			return employeeRepository.save(emp);
+		}
+		return null;
 	}
 
 }
